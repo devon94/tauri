@@ -1,5 +1,10 @@
 # Changelog
 
+## \[2.0.0-alpha.1]
+
+- Properly proxy dev server requests with query strings and fragments.
+  - [a9b4cf20](https://www.github.com/tauri-apps/tauri/commit/a9b4cf20a3e9a5cc984727a56111591504e084c0) fix(core): use entire request URL on dev server proxy ([#5819](https://www.github.com/tauri-apps/tauri/pull/5819)) on 2022-12-12
+
 ## \[2.0.0-alpha.0]
 
 - Added the `default-tls` and `reqwest-default-tls` Cargo features for enabling TLS suppport to connect over HTTPS.

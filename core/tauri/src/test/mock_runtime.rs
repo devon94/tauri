@@ -5,6 +5,7 @@
 #![allow(dead_code)]
 
 use tauri_runtime::{
+  ActivationPolicy,
   menu::{Menu, MenuUpdate},
   monitor::Monitor,
   webview::{WindowBuilder, WindowBuilderBase},
@@ -104,6 +105,11 @@ impl<T: UserEvent> RuntimeHandle<T> for MockRuntimeHandle {
   /// Hides the application.
   #[cfg(target_os = "macos")]
   fn hide(&self) -> Result<()> {
+    Ok(())
+  }
+
+  #[cfg(target_os = "macos")]
+  fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy) -> Result<()> {
     Ok(())
   }
 }
@@ -710,6 +716,9 @@ impl<T: UserEvent> Runtime<T> for MockRuntime {
   #[cfg(target_os = "macos")]
   #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
   fn hide(&self) {}
+
+  #[cfg(target_os = "macos")]
+  fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy) {}
 
   fn set_device_event_filter(&mut self, filter: DeviceEventFilter) {}
 

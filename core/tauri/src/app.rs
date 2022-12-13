@@ -770,6 +770,17 @@ macro_rules! shared_app_impl {
         }
         Ok(())
       }
+
+      /// Sets the activation policy for the application at runtime. It is set to `NSApplicationActivationPolicyRegular` by default.
+      #[cfg(target_os = "macos")]
+      pub fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy) -> crate::Result<()> {
+        match self.runtime() {
+          RuntimeOrDispatch::Runtime(r) => r.set_activation_policy_at_runtime(activation_policy),
+          RuntimeOrDispatch::RuntimeHandle(h) => h.set_activation_policy_at_runtime(activation_policy)?,
+          _ => unreachable!(),
+        }
+        Ok(())
+      }
     }
   };
 }

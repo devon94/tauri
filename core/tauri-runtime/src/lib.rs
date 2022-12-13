@@ -335,6 +335,7 @@ pub struct RunIteration {
 #[cfg(target_os = "macos")]
 #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
 #[non_exhaustive]
+#[derive(Debug, Clone)]
 pub enum ActivationPolicy {
   /// Corresponds to NSApplicationActivationPolicyRegular.
   Regular,
@@ -379,6 +380,11 @@ pub trait RuntimeHandle<T: UserEvent>: Debug + Clone + Send + Sync + Sized + 'st
   #[cfg(target_os = "macos")]
   #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
   fn hide(&self) -> Result<()>;
+
+  /// Sets the activation policy for the application at runtime. It is set to `NSApplicationActivationPolicyRegular` by default.
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
+  fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy) -> Result<()>;
 }
 
 /// A global shortcut manager.
@@ -477,6 +483,11 @@ pub trait Runtime<T: UserEvent>: Debug + Sized + 'static {
   #[cfg(target_os = "macos")]
   #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
   fn hide(&self);
+
+  /// Sets the activation policy for the application at runtime. It is set to `NSApplicationActivationPolicyRegular` by default.
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
+  fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy);
 
   /// Change the device event filter mode.
   ///

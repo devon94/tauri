@@ -1020,6 +1020,7 @@ unsafe impl Send for RawWindowHandle {}
 pub enum ApplicationMessage {
   Show,
   Hide,
+  SetActivationPolicyAtRuntime(ActivationPolicy),
 }
 
 pub enum WindowMessage {
@@ -1847,6 +1848,16 @@ impl<T: UserEvent> RuntimeHandle<T> for WryHandle<T> {
       Message::Application(ApplicationMessage::Hide),
     )
   }
+
+  #[cfg(target_os = "macos")]
+  fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy) -> Result<()> {
+    send_user_message(
+      &self.context,
+      Message::Application(ApplicationMessage::SetActivationPolicyAtRuntime(
+        activation_policy,
+      )),
+    )
+  }
 }
 
 impl<T: UserEvent> Wry<T> {
@@ -2066,6 +2077,17 @@ impl<T: UserEvent> Runtime<T> for Wry<T> {
   fn hide(&self) {
     self.event_loop.hide_application();
   }
+  #[cfg(target_os = "macos")]
+  fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy) {
+    self
+      .event_loop
+      .set_activation_policy_at_runtime(match activation_policy {
+        ActivationPolicy::Regular => WryActivationPolicy::Regular,
+        ActivationPolicy::Accessory => WryActivationPolicy::Accessory,
+        ActivationPolicy::Prohibited => WryActivationPolicy::Prohibited,
+        _ => unimplemented!(),
+      });
+  }
 
   fn set_device_event_filter(&mut self, filter: DeviceEventFilter) {
     self
@@ -2271,6 +2293,16 @@ fn handle_user_message<T: UserEvent>(
       ApplicationMessage::Hide => {
         event_loop.hide_application();
       }
+      ApplicationMessage::SetActivationPolicyAtRuntime(ActivationPolicy::Accessory) => {
+        event_loop.set_activation_policy_at_runtime(WryActivationPolicy::Accessory);
+      }
+      ApplicationMessage::SetActivationPolicyAtRuntime(ActivationPolicy::Regular) => {
+        event_loop.set_activation_policy_at_runtime(WryActivationPolicy::Regular);
+      }
+      ApplicationMessage::SetActivationPolicyAtRuntime(ActivationPolicy::Prohibited) => {
+        event_loop.set_activation_policy_at_runtime(WryActivationPolicy::Prohibited);
+      }
+      ApplicationMessage::SetActivationPolicyAtRuntime(_) => unimplemented!(),
     },
     Message::Window(id, window_message) => {
       if let WindowMessage::UpdateMenuItem(item_id, update) = window_message {

@@ -374,12 +374,27 @@ fn run_light(
   let mut has_wix_util_extension = false;
 
   for ext in extensions {
-    if ext.ends_with("WixUIExtension") {
-      has_wix_ui_extension = true;
-    }
-    if ext.ends_with("WixUtilExtension") {
-      has_wix_util_extension = true;
-    }
+    has_wix_ui_extension = match ext.file_stem() {
+      Some(name) => {
+        if name == "WixUIExtension" {
+          true;
+        }
+
+        false
+      }
+      None => false,
+    };
+
+    has_wix_util_extension = match ext.file_stem() {
+      Some(name) => {
+        if name == "WixUtilExtension" {
+          true;
+        }
+
+        false
+      }
+      None => false,
+    };
 
     cmd.arg("-ext");
     cmd.arg(ext);

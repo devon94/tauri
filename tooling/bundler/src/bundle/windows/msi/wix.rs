@@ -366,22 +366,35 @@ fn run_light(
 ) -> crate::Result<()> {
   let light_exe = wix_toolset_path.join("light.exe");
 
-  let mut args: Vec<String> = vec![
-    "-ext".to_string(),
-    "WixUIExtension".to_string(),
-    "-ext".to_string(),
-    "WixUtilExtension".to_string(),
-    "-o".to_string(),
-    output_path.display().to_string(),
-  ];
-
-  args.extend(arguments);
+  let mut args: Vec<String> = vec![];
 
   let mut cmd = Command::new(&light_exe);
+
+  let mut has_wix_ui_extension = false;
+  let mut has_wix_util_extension = false;
+
   for ext in extensions {
+    if ext.ends_with("WixUIExtension") {
+      has_wix_ui_extension = true;
+    }
+    if ext.ends_with("WixUtilExtension") {
+      has_wix_util_extension = true;
+    }
+
     cmd.arg("-ext");
     cmd.arg(ext);
   }
+
+  if !has_wix_ui_extension {
+    args.extend(["-ext".to_string(), "WixUIExtension".to_string()]);
+  }
+  if !has_wix_util_extension {
+    args.extend(["-ext".to_string(), "WixUtilExtension".to_string()]);
+  }
+
+  args.extend(["-o".to_string(), output_path.display().to_string()]);
+  args.extend(arguments);
+
   clear_env_for_wix(&mut cmd);
   cmd
     .args(&args)
